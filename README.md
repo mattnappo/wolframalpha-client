@@ -1,2 +1,2 @@
-# wolframalpha-client
-WolframAlpha Desktop client
+# WolframAlpha Desktop Client
+The WolframAlpha Desktop Client
