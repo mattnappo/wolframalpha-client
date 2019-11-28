@@ -21,10 +21,16 @@ func NewSearch(search string) (Search, error) {
 		return Search{}, errors.New("search text must not be empty")
 	}
 
+	// Parse the search
+	parsedSearch, err := parseSearch(search)
+	if err != nil {
+		return Search{}, err
+	}
+
 	return Search{
-		Search:  search,     // The search text
-		Request: "",         // Blank for now
-		Time:    time.Now(), // The current time
+		Search:  search,       // The search text
+		Request: parsedSearch, // The parsed search url
+		Time:    time.Now(),   // The current time
 	}, nil
 }
 

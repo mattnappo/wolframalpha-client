@@ -1,4 +1,4 @@
-package scraper
+package engine
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/xoreo/wolframalpha-client/core"
 )
 
-func TestScrape(t *testing.T) {
+func TestMakeSearch(t *testing.T) {
 	core.InitSelenium()
 
 	cwd, err := core.NewChromeWebDriver(8081)
@@ -14,7 +14,7 @@ func TestScrape(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = Scrape(cwd.WebDriver)
+	err = MakeSearch(cwd)
 	if err != nil {
 		t.Fatal(err)
 	}
