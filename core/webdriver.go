@@ -12,6 +12,7 @@ import (
 // ChromeWebDriver is an abstraction class for a selenium chrome webdriver.
 type ChromeWebDriver struct {
 	WebDriver *selenium.WebDriver `json:"web_driver"` // The web driver itself
+	Service   *selenium.Service   `json:"service"`    // The selenium service
 
 	Options      []selenium.ServiceOption `json:"options"`      // The service configuration/options
 	Capabilities selenium.Capabilities    `json:"Capabilities"` // The capabilities (further browser configuration)
@@ -31,12 +32,10 @@ func NewChromeWebDriver(port int) (*ChromeWebDriver, error) {
 	}
 
 	// Initialize the selenium service
-	_, err := selenium.NewSeleniumService(SeleniumPath, port, options...)
+	service, err := selenium.NewSeleniumService(SeleniumPath, port, options...)
 	if err != nil {
 		return nil, err
 	}
-
-	// defer service.Stop()
 
 	// Connect to the webdriver instance running locally.
 	caps := selenium.Capabilities{"browser": "chrome"}
@@ -56,11 +55,10 @@ func NewChromeWebDriver(port int) (*ChromeWebDriver, error) {
 		return nil, err
 	}
 
-	// defer webDriver.Quit()
-
 	// Construct the ChromeWebDriver
 	newCWD := &ChromeWebDriver{
 		WebDriver: &webDriver, // The live webdriver itself
+		Service:   service,    // The live selenium service
 
 		Options:      options, // The options declared earlier
 		Capabilities: caps,    // The capabilities declared earlier
@@ -70,6 +68,24 @@ func NewChromeWebDriver(port int) (*ChromeWebDriver, error) {
 	}
 	return newCWD, nil
 
+}
+
+// Stop stops a ChromeWebDriver.
+func (cwd *ChromeWebDriver) Stop() error {
+	// Stop the service
+	err := (*cwd).Service.Stop()
+	if err != nil {
+		return err
+	}
+
+	// Stop the webdriver
+	err = *(*cwd).(*WebDriver).Quit()
+	if err != nil {
+		return err
+	}
+
+	cwd.Running = false
+	return nil
 }
 
 // String marshals a ChromeWebDriver.
