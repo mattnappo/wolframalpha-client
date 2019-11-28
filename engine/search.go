@@ -11,7 +11,7 @@ import (
 
 // outputDivTag the class of the div containing the output from
 // WolframAlpha.
-const outputDivTag = ""
+const outputDivTag = "._2yjzGRtP"
 
 // Search will make a search on WolframAlpha and return the output.
 func Search(search client.Search, cwd *core.ChromeWebDriver) error {
@@ -49,8 +49,9 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 func waitForOutput(wd selenium.WebDriver) (bool, error) {
 	// I know that this is a terrible solution
 	for {
+		var err error
 		// Find the output code based on css class
-		_, err := wd.FindElement(selenium.ByCSSSelector, outputDivTag)
+		_, err = wd.FindElement(selenium.ByCSSSelector, outputDivTag)
 		if err == nil {
 			return true, nil
 		}
