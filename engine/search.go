@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/xoreo/wolframalpha-client/client"
 	"github.com/xoreo/wolframalpha-client/core"
@@ -42,9 +43,20 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		return err
 	}
 
+	// Get all of the calculation divs
 	calculations, err := outputDiv.FindElements(
 		selenium.ByCSSSelector, calculationDivTag,
 	)
+	if err != nil {
+		return err
+	}
+
+	screenshot, err := driver.Screenshot()
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("screenshot.png", screenshot, 0644)
 	if err != nil {
 		return err
 	}
