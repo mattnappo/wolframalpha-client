@@ -9,9 +9,15 @@ import (
 	"github.com/tebeka/selenium"
 )
 
-// outputDivTag the class of the div containing the output from
-// WolframAlpha.
-const outputDivTag = "._2yjzGRtP"
+const (
+	// outputDivTag the class of the div containing the output from
+	// WolframAlpha.
+	outputDivTag = "._2yjzGRtP"
+
+	// calculationDivTag is the class of the div containing a singular
+	// calculation from the result.
+	calculationDivTag = "._3k-JE4Gq"
+)
 
 // Search will make a search on WolframAlpha and return the output.
 func Search(search client.Search, cwd *core.ChromeWebDriver) error {
@@ -30,17 +36,63 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 	}
 
 	// Find the output code based on css class
-	outputDiv, err := driver.FindElement(selenium.ByCSSSelector, outputDivTag)
+	outputDiv, err := driver.FindElement(
+		selenium.ByCSSSelector, outputDivTag)
 	if err != nil {
 		return err
 	}
 
-	// Get the output text in that div
-	outputString, err := outputDiv.Text()
+	calculations, err := outputDiv.FindElements(
+		selenium.ByCSSSelector, calculationDivTag,
+	)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("\n\n\n\n%s\n\n\n\n", outputString)
+
+	// Collect all of the latex
+	var latex []LatexObject
+	for _, calculation := range calculations {
+		// Extract the label of the calculation
+		labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, "-ux9E2hV")
+		if err != nil {
+			return err
+		}
+
+		// Get the text from the div
+		label, err := labelDiv.Text()
+		if err != nil {
+			return err
+		}
+
+		// Find the div containing the url
+		urlDiv, err := calculation.FindElement(selenium.ByCSSSelector, "ZbCdqua6")
+		if err != nil {
+			return err
+		}
+
+		// Get the URL itself
+		url, err := urlDiv.GetAttribute("src")
+		if err != nil {
+			return err
+		}
+
+		// Create the new LatexObject
+		newLatex, err := NewLatexObject(label, url)
+		if err != nil {
+			return err
+		}
+
+		latex = append(latex, newLatex)
+	}
+
+	fmt.Println(latex)
+
+	// // Get the output text in that div
+	// outputString, err := outputDiv.Text()
+	// if err != nil {
+	// 	return err
+	// }
+	// fmt.Printf("\n\n\n\n%s\n\n\n\n", outputString)
 
 	return nil
 }
