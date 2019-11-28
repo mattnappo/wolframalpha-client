@@ -21,5 +21,4 @@ func InitPaths() {
 	SeleniumPath, _ = filepath.Abs(SeleniumPath)
 	ChromeDriverPath, _ = filepath.Abs(ChromeDriverPath)
 	ChromeBinPath, _ = filepath.Abs(ChromeBinPath)
-
 }
