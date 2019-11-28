@@ -73,13 +73,14 @@ func NewChromeWebDriver(port int) (*ChromeWebDriver, error) {
 // Stop stops a ChromeWebDriver.
 func (cwd *ChromeWebDriver) Stop() error {
 	// Stop the service
-	err := (*cwd).Service.Stop()
+	err := cwd.Service.Stop()
 	if err != nil {
 		return err
 	}
 
+	webDriver := *cwd.WebDriver
 	// Stop the webdriver
-	err = *(*cwd).(*WebDriver).Quit()
+	err = webDriver.Quit()
 	if err != nil {
 		return err
 	}

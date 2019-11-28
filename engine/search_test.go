@@ -24,4 +24,9 @@ func TestMSearch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	err = cwd.Stop()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
