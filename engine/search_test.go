@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/xoreo/wolframalpha-client/core"
+	"github.com/xoreo/wolframalpha-client/client"
 )
 
-func TestMakeSearch(t *testing.T) {
+func TestMSearch(t *testing.T) {
 	core.InitSelenium()
 
 	cwd, err := core.NewChromeWebDriver(8081)
@@ -14,7 +15,12 @@ func TestMakeSearch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = MakeSearch(cwd)
+	search, err := client.NewSearch("ten added to 10")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = Search(search, cwd)
 	if err != nil {
 		t.Fatal(err)
 	}
