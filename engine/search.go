@@ -20,7 +20,7 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 	}
 
 	// Find the output code based on css class
-	outputDiv, err := driver.FindElement(selenium.ByCSSSelector, "._2HkkNXzH")
+	outputDiv, err := driver.FindElement(selenium.ByCSSSelector, "._1jPLqSjg")
 	if err != nil {
 		return err
 	}
