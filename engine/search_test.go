@@ -3,11 +3,11 @@ package engine
 import (
 	"testing"
 
-	"github.com/xoreo/wolframalpha-client/core"
 	"github.com/xoreo/wolframalpha-client/client"
+	"github.com/xoreo/wolframalpha-client/core"
 )
 
-func TestMSearch(t *testing.T) {
+func TestSearch(t *testing.T) {
 	core.InitSelenium()
 
 	cwd, err := core.NewChromeWebDriver(8081)
