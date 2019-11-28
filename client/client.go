@@ -2,6 +2,7 @@ package client
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -31,12 +32,31 @@ func NewSearch(search string) (Search, error) {
 // parseSearchForRequest parses a search (string) and returns
 // a WolframAlpha request.
 func parseSearch(search string) (string, error) {
-	baseRequest := "https: //www.wolframalpha.com/input/?i="
-	search = strings.ReplaceAll(search, " ", "+")
+	baseRequest := "https://www.wolframalpha.com/input/?i=" // The base request
+	search = strings.ReplaceAll(search, " ", "+")           // Replace spaces with +
 
 	var escapedSearch []string
-	for i := 0; i < len(search); i++ {
-		for _, char := range common.UnsafeChars()
-		if search[i] == 
+	for i := 0; i < len(search); i++ { // For each letter in the search
+		illegal := false
+		for j, char := range common.UnsafeChars { // For each illegal char
+			// Make that char legal
+			if string(search[i]) == char {
+				escapedSearch = append(escapedSearch, common.SafeChars[j])
+				illegal = true
+				break
+			}
+		}
+
+		if !illegal {
+			escapedSearch = append(escapedSearch, string(search[i]))
+		}
 	}
+
+	fmt.Println(escapedSearch)
+
+	if len(escapedSearch) >= 1900 {
+		return "", errors.New("that search is too long")
+	}
+
+	return "", nil
 }
