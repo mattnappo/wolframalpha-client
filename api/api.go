@@ -35,9 +35,13 @@ func NewAPI() (*API, error) {
 
 	// Enable CORS
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     common.AllowOrigins,
-		AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Access-Control-Allow-Origin", "Content-Type"},
+		AllowOrigins: common.AllowOrigins,
+		AllowMethods: []string{"PUT", "PATCH", "POST", "GET", "DELETE"},
+		AllowHeaders: []string{
+			"Origin",
+			"Access-Control-Allow-Origin",
+			"Content-Type",
+		},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		AllowOriginFunc: func(origin string) bool {
@@ -53,14 +57,10 @@ func NewAPI() (*API, error) {
 		Client: http.DefaultClient, // Set the HTTP client to the default HTTP client
 	}
 
-	err = api.initLogger() // Initialize the API's logger
+	// Initialize the API's logger
+	err := api.initLogger()
 	if err != nil {
 		return nil, err
-	}
-
-	// Iterate through the provided options
-	for _, opt := range opts {
-		opt(api) // Apply the option
 	}
 
 	return api, nil
@@ -84,9 +84,12 @@ func (api *API) StartServing(port int64) error {
 
 // initLogger initializes the API's logger.
 func (api *API) initLogger() error {
-	logger := loggo.GetLogger("API")                                          // Get logger
-	err := common.CreateDirIfDoesNotExist(filepath.FromSlash(common.LogsDir)) // Create log dir
-	if err != nil {                                                           // Check for errors
+	logger := loggo.GetLogger("API") // Get logger
+	// Create log dir
+	err := common.CreateDirIfDoesNotExist(
+		filepath.FromSlash(common.LogsDir),
+	)
+	if err != nil { // Check for errors
 		return err // Return found error
 	}
 
@@ -99,13 +102,17 @@ func (api *API) initLogger() error {
 		return err // Return found error
 	}
 
-	_, err = loggo.ReplaceDefaultWriter(loggocolor.NewWriter(os.Stderr)) // Enabled colored output
-	if err != nil {                                                      // Check for errors
+	// Enabled colored output
+	_, err = loggo.ReplaceDefaultWriter(loggocolor.NewWriter(os.Stderr))
+	if err != nil {
 		return err // Return found error
 	}
 
-	err = loggo.RegisterWriter("logs", loggo.NewSimpleWriter(logFile, loggo.DefaultFormatter)) // Register file writer
-	if err != nil {                                                                            // Check for errors
+	// Register file writer
+	err = loggo.RegisterWriter("logs", loggo.NewSimpleWriter(
+		logFile, loggo.DefaultFormatter),
+	)
+	if err != nil { // Check for errors
 		return err // Return found error
 	}
 
