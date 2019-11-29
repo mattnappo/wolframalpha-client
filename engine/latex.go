@@ -1,6 +1,9 @@
 package engine
 
-import "errors"
+import (
+	"encoding/json"
+	"errors"
+)
 
 // LatexObject represents a LaTeX object.
 type LatexObject struct {
@@ -19,4 +22,10 @@ func NewLatexObject(label, url string) (LatexObject, error) {
 		Label: label, // The label
 		URL:   url,   // The URL to the LaTeX
 	}, nil
+}
+
+// String marshals a latexObject as a string.
+func (latexObject LatexObject) String() string {
+	json, _ := json.MarshalIndent(latexObject, "", "  ")
+	return string(json)
 }
