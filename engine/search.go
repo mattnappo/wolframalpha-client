@@ -65,12 +65,12 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		return err
 	}
 
-	sc, err := outputDiv.Screenshot(true)
-	if err != nil {
-		return err
-	}
+	// sc, err := outputDiv.Screenshot(true)
+	// if err != nil {
+	// 	return err
+	// }
 
-	ioutil.WriteFile("screenshot.jpg", sc, 0644)
+	// ioutil.WriteFile("screenshot.jpg", sc, 0644)
 
 	// Collect all of the latex
 	var latex []LatexObject
