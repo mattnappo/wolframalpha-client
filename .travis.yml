@@ -1,0 +1,39 @@
+language: go
+
+env:
+  global:
+  - GO111MODULE=on
+
+notifications:
+  email: true
+
+install:
+  - export GO111MODULE=on
+  - go get -u
+
+install: true
+
+jobs:
+  include:
+    - stage: validate
+      name: "lint"
+      script:
+        - chmod +x ./scripts/validate_lint.sh # Make validate lint executable
+        - ./scripts/validate_lint.sh # Validate lint
+    - name: "vet"
+      script:
+        - go vet ./... # Run static analyzer
+    - name: "gofmt"
+      script:
+        - cd $(mktemp -d); go mod init tmp; go get mvdan.cc/gofumpt; cd $TRAVIS_BUILD_DIR
+        - git diff --quiet || (echo "\033[0;31mWorking directory not clean!\033[0m" && exit 1) # Check working dir clean
+        - gofumpt -w -s . # Fmt
+    - name: "tidy"
+      script:
+        - git diff --quiet || (echo "\033[0;31mWorking directory not clean!\033[0m" && exit 1) # Check working dir clean
+        - go mod tidy # Tidy
+    - stage: test
+      name: "test"
+      script:
+        - go run main.go # Run main
+        - chmod +x ./scripts/test.sh && ./scripts/test.sh # Run unit tests
