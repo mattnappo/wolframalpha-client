@@ -7,6 +7,7 @@ import (
 
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
+	"github.com/tebeka/selenium/log"
 )
 
 // ChromeWebDriver is an abstraction class for a selenium chrome webdriver.
@@ -39,7 +40,7 @@ func NewChromeWebDriver(port int) (*ChromeWebDriver, error) {
 
 	// Connect to the webdriver instance running locally.
 	caps := selenium.Capabilities{"browser": "chrome"}
-	caps.SetLogLevel(selenium.Server, selenium.Severe)
+	caps.SetLogLevel(log.Server, log.Severe)
 
 	// Declare the capabilities for chrome
 	var chromeCaps chrome.Capabilities
