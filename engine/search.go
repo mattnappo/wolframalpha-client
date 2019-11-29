@@ -1,21 +1,63 @@
 package engine
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
-
-	"github.com/xoreo/wolframalpha-client/client"
-	"github.com/xoreo/wolframalpha-client/core"
+	"strings"
+	"time"
 
 	"github.com/tebeka/selenium"
+	"github.com/xoreo/wolframalpha-client/common"
+	"github.com/xoreo/wolframalpha-client/core"
 )
 
-// calculationDivTag is the class of the div containing a singular
-// calculation from the result.
-const calculationDivTag = "._3k-JE4Gq"
+const (
+	// calculationDivTag is the class of the div containing a singular
+	// calculation from the result.
+	calculationDivTag = "._3k-JE4Gq"
 
-// Search will make a search on WolframAlpha and return the output.
-func Search(search client.Search, cwd *core.ChromeWebDriver) error {
+	// labelTag is the class of the div containing the label
+	// from a result.
+	labelTag = ".-ux9E2hV"
+
+	// urlTag is the class of the div containing the url
+	// from a result.
+	urlTag = ".ZbCdqua6"
+)
+
+// SearchObject represents a search on WolframAlpha.
+type SearchObject struct {
+	SearchText string    `json:"search_text"` // The search text
+	Request    string    `json:"request"`     // The WolframAlpha request (URL)
+	Time       time.Time `json:"time"`        // The time of search
+
+	Result []LatexObject `json:"result"` // The search result
+}
+
+// NewSearchObject makes a new Search struct.
+func NewSearchObject(searchText string) (SearchObject, error) {
+	if searchText == "" {
+		return SearchObject{}, errors.New("search text must not be empty")
+	}
+
+	// Parse the search
+	parsedSearch, err := parseSearch(searchText)
+	if err != nil {
+		return SearchObject{}, err
+	}
+
+	return SearchObject{
+		SearchText: searchText,   // The search text
+		Request:    parsedSearch, // The parsed search url
+		Time:       time.Now(),   // The current time
+
+		Result: nil, // Nil for now
+	}, nil
+}
+
+// Search will execute the search.
+func (search *SearchObject) Search(cwd *core.ChromeWebDriver) error {
 	driver := *cwd.WebDriver
 
 	// Make the get request to the url of the search
@@ -72,6 +114,9 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 	}
 	fmt.Printf("\nlatex: %v\n", latex)
 
+	// Update the search result
+	search.Result = latex
+
 	return nil
 }
 
@@ -91,7 +136,7 @@ func waitForOutput(wd selenium.WebDriver) (bool, error) {
 // extractLabel extracts the label from a calculation (response div).
 func extractLabel(calculation selenium.WebElement) (string, error) {
 	// Extract the label of the calculation
-	labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".-ux9E2hV")
+	labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, labelTag)
 	if err != nil {
 		return "", err
 	}
@@ -108,7 +153,7 @@ func extractLabel(calculation selenium.WebElement) (string, error) {
 // extractURL extracts the URL from a calculation (response div).
 func extractURL(calculation selenium.WebElement) (string, error) {
 	// Find the div containing the url
-	urlDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".ZbCdqua6")
+	urlDiv, err := calculation.FindElement(selenium.ByCSSSelector, urlTag)
 	if err != nil {
 		return "", err
 	}
@@ -120,4 +165,38 @@ func extractURL(calculation selenium.WebElement) (string, error) {
 	}
 
 	return url, nil
+}
+
+// parseSearchForRequest parses a search (string) and returns
+// a WolframAlpha request.
+func parseSearch(search string) (string, error) {
+	baseRequest := "https://www.wolframalpha.com/input/?i=" // The base request
+
+	var escapedSearch []string
+	for i := 0; i < len(search); i++ { // For each letter in the search
+		illegal := false
+		for j, char := range common.UnsafeChars { // For each illegal char
+			// Make that char legal
+			if string(search[i]) == char {
+				escapedSearch = append(escapedSearch, common.SafeChars[j])
+				illegal = true
+				break
+			}
+		}
+
+		if !illegal {
+			escapedSearch = append(escapedSearch, string(search[i]))
+		}
+	}
+
+	// Make sure the search isn't too long
+	if len(escapedSearch) >= 1900 {
+		return "", errors.New("that search is too long")
+	}
+
+	// Piece the []string back together (into a string)
+	escapedSearchString := strings.Join(escapedSearch, "")
+	escapedSearchString = strings.Replace(escapedSearchString, " ", "+", -1)
+	request := baseRequest + escapedSearchString // Make the request
+	return request, nil
 }

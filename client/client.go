@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/xoreo/wolframalpha-client/common"
+	"github.com/xoreo/wolframalpha-client/engine"
 )
 
 // Search represents a search on WolframAlpha.
@@ -13,6 +14,8 @@ type Search struct {
 	Search  string    `json:"search"`  // The search text
 	Request string    `json:"request"` // The WolframAlpha request (URL)
 	Time    time.Time `json:"time"`    // The time of search
+
+	Result []engine.LatexObject `json:"result"` // The search result
 }
 
 // NewSearch makes a new Search struct.
@@ -31,6 +34,8 @@ func NewSearch(search string) (Search, error) {
 		Search:  search,       // The search text
 		Request: parsedSearch, // The parsed search url
 		Time:    time.Now(),   // The current time
+
+		Result: nil, // Nil for now
 	}, nil
 }
 
