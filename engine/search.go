@@ -38,7 +38,7 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 	}
 
 	// Find the output code based on css class
-	outputDiv, err := driver.FindElement(
+	_, err = driver.FindElement(
 		selenium.ByCSSSelector, outputDivTag)
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("\n\n\n%s THING", s)
+		// fmt.Printf("\n\n\n%s THING", s)
 
 		// Get the text from the div
 		label, err := labelDiv.Text()
