@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/xoreo/wolframalpha-client/client"
 	"github.com/xoreo/wolframalpha-client/core"
@@ -42,18 +43,25 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		return err
 	}
 
-	calculations, err := outputDiv.FindElements(
+	calculations, err := driver.FindElements(
 		selenium.ByCSSSelector, calculationDivTag,
 	)
 	if err != nil {
 		return err
 	}
 
+	sc, err := outputDiv.Screenshot(true)
+	if err != nil {
+		return err
+	}
+
+	ioutil.WriteFile("screenshot.jpg", sc, 0644)
+
 	// Collect all of the latex
 	var latex []LatexObject
 	for _, calculation := range calculations {
 		// Extract the label of the calculation
-		labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, "-ux9E2hV")
+		labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".-ux9E2hV")
 		if err != nil {
 			return err
 		}
@@ -65,7 +73,7 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		}
 
 		// Find the div containing the url
-		urlDiv, err := calculation.FindElement(selenium.ByCSSSelector, "ZbCdqua6")
+		urlDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".ZbCdqua6")
 		if err != nil {
 			return err
 		}
@@ -85,6 +93,7 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		latex = append(latex, newLatex)
 	}
 
+	fmt.Printf("\n\n\n\nLATEX:")
 	fmt.Println(latex)
 
 	// // Get the output text in that div
