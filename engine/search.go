@@ -44,12 +44,7 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		return err
 	}
 
-<<<<<<< HEAD
 	calculations, err := driver.FindElements(
-=======
-	// Get all of the calculation divs
-	calculations, err := outputDiv.FindElements(
->>>>>>> b81007598501caf3c5b1a86ec8f6efe3a40f534d
 		selenium.ByCSSSelector, calculationDivTag,
 	)
 	fmt.Printf("\n\nSIZE: %d\n\n", len(calculations))
@@ -83,13 +78,6 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		fmt.Printf("\n\nI AM RUNNING\n\n")
 		// Extract the label of the calculation
 		labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".-ux9E2hV")
-<<<<<<< HEAD
-=======
-		if err != nil {
-			return err
-		}
-		s, err = labelDiv.TagName()
->>>>>>> b81007598501caf3c5b1a86ec8f6efe3a40f534d
 		if err != nil {
 			return err
 		}
@@ -121,12 +109,8 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 
 		latex = append(latex, newLatex)
 	}
-<<<<<<< HEAD
 
 	fmt.Printf("\n\n\n\nLATEX:")
-=======
-	fmt.Printf("\n\n\n\n")
->>>>>>> b81007598501caf3c5b1a86ec8f6efe3a40f534d
 	fmt.Println(latex)
 
 	// // Get the output text in that div
