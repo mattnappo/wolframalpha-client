@@ -39,6 +39,7 @@ func NewChromeWebDriver(port int) (*ChromeWebDriver, error) {
 
 	// Connect to the webdriver instance running locally.
 	caps := selenium.Capabilities{"browser": "chrome"}
+	caps.SetLogLevel(selenium.Server, selenium.Severe)
 
 	// Declare the capabilities for chrome
 	var chromeCaps chrome.Capabilities
