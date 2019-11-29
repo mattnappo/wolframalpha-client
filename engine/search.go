@@ -10,16 +10,9 @@ import (
 	"github.com/tebeka/selenium"
 )
 
-const (
-	// outputDivTag the class of the div containing the output from
-	// WolframAlpha.
-	outputDivTag = "._1jPLqSjg"
-	// outputDivTag = "._2ckn5Li6"
-
-	// calculationDivTag is the class of the div containing a singular
-	// calculation from the result.
-	calculationDivTag = "._3k-JE4Gq"
-)
+// calculationDivTag is the class of the div containing a singular
+// calculation from the result.
+const calculationDivTag = "._3k-JE4Gq"
 
 // Search will make a search on WolframAlpha and return the output.
 func Search(search client.Search, cwd *core.ChromeWebDriver) error {
@@ -31,35 +24,21 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		return err
 	}
 
-	// Wait for the output/result to populate the DOM
+	// Wait for the calculations to complete
 	err = driver.Wait(waitForOutput)
 	if err != nil {
 		return err
 	}
 
-	// Find the output code based on css class
-	_, err = driver.FindElement(
-		selenium.ByCSSSelector, outputDivTag)
-	if err != nil {
-		return err
-	}
-
-	err = driver.Wait(waitForOutput)
-	if err != nil {
-		return err
-	}
-
+	// Find all calculation divs
 	calculations, err := driver.FindElements(
 		selenium.ByCSSSelector, calculationDivTag,
 	)
-	fmt.Printf("\n\nSIZE: %d\n\n", len(calculations))
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("calculations:\n\n\n\n\n")
-	fmt.Println(calculations)
-
+	// Take a screenshot of the current window
 	screenshot, err := driver.Screenshot()
 	if err != nil {
 		return err
@@ -70,60 +49,28 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		return err
 	}
 
-	// sc, err := outputDiv.Screenshot(true)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// ioutil.WriteFile("screenshot.jpg", sc, 0644)
-
-	// Collect all of the latex
+	// Collect all of the latex from the calculations
 	var latex []LatexObject
 	for _, calculation := range calculations {
-		fmt.Printf("\n\nI AM RUNNING\n\n")
-		// Extract the label of the calculation
-		labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".-ux9E2hV")
+		// Get the label and the url
+		label, err := extractLabel(calculation)
 		if err != nil {
 			return err
 		}
-		// fmt.Printf("\n\n\n%s THING", s)
-
-		// Get the text from the div
-		label, err := labelDiv.Text()
+		url, err := extractURL(calculation)
 		if err != nil {
 			return err
 		}
 
-		// Find the div containing the url
-		urlDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".ZbCdqua6")
-		if err != nil {
-			return err
-		}
-
-		// Get the URL itself
-		url, err := urlDiv.GetAttribute("src")
-		if err != nil {
-			return err
-		}
-
-		// Create the new LatexObject
+		// Create the new LatexObject with the data
 		newLatex, err := NewLatexObject(label, url)
 		if err != nil {
 			return err
 		}
 
-		latex = append(latex, newLatex)
+		latex = append(latex, newLatex) // Add it to the list of LaTeX objects
 	}
-
-	fmt.Printf("\n\n\n\nLATEX:")
-	fmt.Println(latex)
-
-	// // Get the output text in that div
-	// outputString, err := outputDiv.Text()
-	// if err != nil {
-	// 	return err
-	// }
-	// fmt.Printf("\n\n\n\n%s\n\n\n\n", outputString)
+	fmt.Printf("\nlatex: %v\n", latex)
 
 	return nil
 }
@@ -139,4 +86,38 @@ func waitForOutput(wd selenium.WebDriver) (bool, error) {
 			return true, nil
 		}
 	}
+}
+
+// extractLabel extracts the label from a calculation (response div).
+func extractLabel(calculation selenium.WebElement) (string, error) {
+	// Extract the label of the calculation
+	labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".-ux9E2hV")
+	if err != nil {
+		return "", err
+	}
+
+	// Get the text from the div
+	label, err := labelDiv.Text()
+	if err != nil {
+		return "", err
+	}
+
+	return label, nil
+}
+
+// extractURL extracts the URL from a calculation (response div).
+func extractURL(calculation selenium.WebElement) (string, error) {
+	// Find the div containing the url
+	urlDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".ZbCdqua6")
+	if err != nil {
+		return "", err
+	}
+
+	// Get the URL itself
+	url, err := urlDiv.GetAttribute("src")
+	if err != nil {
+		return "", err
+	}
+
+	return url, nil
 }
