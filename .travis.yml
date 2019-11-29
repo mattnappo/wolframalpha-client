@@ -5,7 +5,11 @@ env:
   - GO111MODULE=on
 
 notifications:
-  email: true
+  email: false
+
+before_install:
+  - chmod +x scripts/before_install.sh
+  - ./scripts/before_install.sh
 
 install:
   - export GO111MODULE=on
