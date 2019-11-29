@@ -44,6 +44,11 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		return err
 	}
 
+	err = driver.Wait(waitForOutput)
+	if err != nil {
+		return err
+	}
+
 	calculations, err := driver.FindElements(
 		selenium.ByCSSSelector, calculationDivTag,
 	)
@@ -129,7 +134,7 @@ func waitForOutput(wd selenium.WebDriver) (bool, error) {
 	for {
 		var err error
 		// Find the output code based on css class
-		_, err = wd.FindElement(selenium.ByCSSSelector, outputDivTag)
+		_, err = wd.FindElement(selenium.ByCSSSelector, calculationDivTag)
 		if err == nil {
 			return true, nil
 		}

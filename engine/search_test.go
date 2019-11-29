@@ -15,7 +15,7 @@ func TestSearch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	search, err := client.NewSearch("ten added to 10")
+	search, err := client.NewSearch("integral from 0 to 2 of x^4 dx")
 	if err != nil {
 		t.Fatal(err)
 	}
