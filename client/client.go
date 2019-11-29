@@ -38,7 +38,6 @@ func NewSearch(search string) (Search, error) {
 // a WolframAlpha request.
 func parseSearch(search string) (string, error) {
 	baseRequest := "https://www.wolframalpha.com/input/?i=" // The base request
-	search = strings.Replace(search, " ", "+", -1)        // Replace spaces with %20
 
 	var escapedSearch []string
 	for i := 0; i < len(search); i++ { // For each letter in the search
@@ -64,7 +63,7 @@ func parseSearch(search string) (string, error) {
 
 	// Piece the []string back together (into a string)
 	escapedSearchString := strings.Join(escapedSearch, "")
-
+	escapedSearchString = strings.Replace(escapedSearchString, " ", "+", -1)
 	request := baseRequest + escapedSearchString // Make the request
 	return request, nil
 }
