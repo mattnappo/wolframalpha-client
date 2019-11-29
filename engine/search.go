@@ -13,7 +13,8 @@ import (
 const (
 	// outputDivTag the class of the div containing the output from
 	// WolframAlpha.
-	outputDivTag = "._2yjzGRtP"
+	outputDivTag = "._1jPLqSjg"
+	// outputDivTag = "._2ckn5Li6"
 
 	// calculationDivTag is the class of the div containing a singular
 	// calculation from the result.
@@ -43,9 +44,28 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 		return err
 	}
 
+<<<<<<< HEAD
 	calculations, err := driver.FindElements(
+=======
+	// Get all of the calculation divs
+	calculations, err := outputDiv.FindElements(
+>>>>>>> b81007598501caf3c5b1a86ec8f6efe3a40f534d
 		selenium.ByCSSSelector, calculationDivTag,
 	)
+	fmt.Printf("\n\nSIZE: %d\n\n", len(calculations))
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("calculations:\n\n\n\n\n")
+	fmt.Println(calculations)
+
+	screenshot, err := driver.Screenshot()
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("screenshot.png", screenshot, 0644)
 	if err != nil {
 		return err
 	}
@@ -60,11 +80,20 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 	// Collect all of the latex
 	var latex []LatexObject
 	for _, calculation := range calculations {
+		fmt.Printf("\n\nI AM RUNNING\n\n")
 		// Extract the label of the calculation
 		labelDiv, err := calculation.FindElement(selenium.ByCSSSelector, ".-ux9E2hV")
+<<<<<<< HEAD
+=======
 		if err != nil {
 			return err
 		}
+		s, err = labelDiv.TagName()
+>>>>>>> b81007598501caf3c5b1a86ec8f6efe3a40f534d
+		if err != nil {
+			return err
+		}
+		fmt.Printf("\n\n\n%s THING", s)
 
 		// Get the text from the div
 		label, err := labelDiv.Text()
@@ -92,8 +121,12 @@ func Search(search client.Search, cwd *core.ChromeWebDriver) error {
 
 		latex = append(latex, newLatex)
 	}
+<<<<<<< HEAD
 
 	fmt.Printf("\n\n\n\nLATEX:")
+=======
+	fmt.Printf("\n\n\n\n")
+>>>>>>> b81007598501caf3c5b1a86ec8f6efe3a40f534d
 	fmt.Println(latex)
 
 	// // Get the output text in that div
