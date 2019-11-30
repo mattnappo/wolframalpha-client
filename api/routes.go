@@ -2,8 +2,8 @@ package api
 
 import "path"
 
-// SetupRoutes sets up all necessary API routes.
-func (api *API) SetupRoutes() error {
+// setupRoutes sets up all necessary API routes.
+func (api *API) setupRoutes() error {
 	api.initGETs()
 	api.initPOSTs()
 	return nil

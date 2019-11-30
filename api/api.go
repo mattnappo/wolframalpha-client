@@ -82,7 +82,7 @@ func NewAPI() (*API, error) {
 
 // StartServing starts serving the API.
 func (api *API) StartServing(port int64) error {
-	err := api.SetupRoutes() // Setup API routes
+	err := api.setupRoutes() // Setup API routes
 	if err != nil {          // Check for errors
 		return nil // No error occurred, return nil
 	}
