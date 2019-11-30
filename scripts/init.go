@@ -1,7 +1,8 @@
+package scripts
+
 // Binary init downloads the necessary files to perform an integration test
 // between this WebDriver client and multiple versions of Selenium and
 // browsers.
-package scripts
 
 import (
 	"context"
@@ -182,7 +183,7 @@ func addFirefox(desiredVersion string) {
 	}
 }
 
-// Install vendor installs the necessary vendor code.
+// InstallVendor installs the necessary vendor code.
 func InstallVendor() {
 	flag.Parse()
 	ctx := context.Background()
