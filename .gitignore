@@ -1,3 +1,4 @@
+checker.sh
 *.swp
 vendor/
 .DS_Store
