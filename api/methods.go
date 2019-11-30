@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 
+	"github.com/xoreo/wolframalpha-client/engine"
 	"github.com/gin-gonic/gin"
 	"github.com/juju/loggo"
 )
@@ -28,7 +29,7 @@ func (api *API) search(ctx *gin.Context) {
 	}
 
 	// Create a new search object
-	searchObject, err := api.Engine.NewSearchObject(newSearchText.SearchText)
+	searchObject, err := engine.NewSearchObject(newSearchText.SearchText)
 	if err != nil {
 		// Log and respond with the error
 		api.Logger.Logf(loggo.ERROR, err.Error())
