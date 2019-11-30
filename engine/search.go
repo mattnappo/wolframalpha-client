@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -26,13 +27,20 @@ const (
 	urlTag = ".ZbCdqua6"
 )
 
+// Result is the type for a search result
+type Result []LatexObject
+
+func (result Result) String() string {
+	json, _ := json.MarshalIndent(result, "", "  ")
+	return string(json)
+}
+
 // SearchObject represents a search on WolframAlpha.
 type SearchObject struct {
 	SearchText string    `json:"search_text"` // The search text
 	Request    string    `json:"request"`     // The WolframAlpha request (URL)
 	Time       time.Time `json:"time"`        // The time of search
-
-	Result []LatexObject `json:"result"` // The search result
+	Result     Result    `json:"result"`      // The search result
 }
 
 // NewSearchObject makes a new Search struct.

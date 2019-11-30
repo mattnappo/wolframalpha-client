@@ -8,28 +8,34 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/boltdb/bolt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/juju/loggo"
 	"github.com/juju/loggo/loggocolor"
 	"github.com/xoreo/wolframalpha-client/common"
-	//"github.com/boltdb/bolt"
+	"github.com/xoreo/wolframalpha-client/core"
+	"github.com/xoreo/wolframalpha-client/engine"
 )
 
 // API represents an API instance.
 type API struct {
 	Router *gin.Engine `json:"router"` // The HTTP router
 
-	Root string // API root route
+	DB *bolt.DB `json:"db"` // The database
 
-	Logger *loggo.Logger // The logger
+	CWD    *core.ChromeWebDriver `json:"cwd"` // The web driver / scraper
+	Engine engine.Engine         // The scraping engine
 
-	Client *http.Client // The HTTP client
+	Root string `json:"root"` // API root route
+
+	Logger *loggo.Logger `json:"logger"` // The logger
+
+	Client *http.Client `json:"client"` // The HTTP client
 }
 
 // NewAPI initializes a new API instance.
 func NewAPI() (*API, error) {
-
 	// Initialize the API router
 	router := gin.Default()
 
@@ -50,15 +56,23 @@ func NewAPI() (*API, error) {
 		MaxAge: 12 * time.Hour,
 	}))
 
+	// Create the Chrome WebDriver
+	cwd, err := core.NewChromeWebDriver(common.SeleniumPort)
+	if err != nil {
+		return nil, err
+	}
+
 	// Create new API instance
 	api := &API{
 		Router: router,             // Set router
+		DB:     nil,                // Nil for now
+		CWD:    cwd,                // The Chrome WebDriver (the scraper)
 		Root:   "/api/",            // Set root route
 		Client: http.DefaultClient, // Set the HTTP client to the default HTTP client
 	}
 
 	// Initialize the API's logger
-	err := api.initLogger()
+	err = api.initLogger()
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +88,9 @@ func (api *API) StartServing(port int64) error {
 	}
 
 	// Start the router
-	err = api.Router.Run("0.0.0.0:" + strconv.FormatInt(port, 10))
+	err = api.Router.Run(
+		fmt.Sprintf("0.0.0.0:%s", strconv.FormatInt(port, 10)),
+	)
 	if err != nil {
 		return err
 	}
@@ -120,3 +136,6 @@ func (api *API) initLogger() error {
 
 	return nil // Everything is fine, how are you?
 }
+
+// reportError will log and return an error.
+func reportError(err error, api *API, ctx *gin.Context) {}

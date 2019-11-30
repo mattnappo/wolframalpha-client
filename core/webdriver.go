@@ -22,7 +22,7 @@ type ChromeWebDriver struct {
 	Port    int  `json:"port"`    // The port that the instance will run on
 }
 
-// NewChromeWebDriver returns a new LIVE web driver.
+// NewChromeWebDriver returns a new live web driver.
 func NewChromeWebDriver(port int) (*ChromeWebDriver, error) {
 	fmt.Printf("\n\nSeleniumPath: [%s]\nChromeDriverPath: [%s]\n\n", SeleniumPath, ChromeDriverPath)
 
