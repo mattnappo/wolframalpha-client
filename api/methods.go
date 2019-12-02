@@ -47,5 +47,5 @@ func (api *API) search(ctx *gin.Context) {
 	}
 
 	searchResult := searchObject.Result.String()                 // Get the search result
-	ctx.JSON(http.StatusOK, gin.H{"searchResult": searchResult}) // Respond success
+	ctx.JSON(http.StatusOK, gin.H{"search_result": searchResult}) // Respond success
 }
